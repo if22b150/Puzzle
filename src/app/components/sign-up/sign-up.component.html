@@ -1,0 +1,103 @@
+<div class="d-flex justify-content-center p-5">
+
+  <mat-card>
+    <div class="d-flex justify-content-center mb-2">
+      <mat-card-title>Sign up</mat-card-title>
+    </div>
+
+    <mat-card-content>
+
+      <form [formGroup]="signUpForm">
+
+        <h3>Account details</h3>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>E-Mail</mat-label>
+          <input matInput formControlName="email">
+          <mat-error *ngIf="email.hasError('required')">
+            Email is <strong>required</strong>
+          </mat-error>
+          <mat-error *ngIf="email.hasError('email')">
+            Email is <strong>invalid</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePW ? 'password' : 'text'" formControlName="password">
+          <button mat-icon-button matSuffix (click)="hidePW = !hidePW" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePW">
+            <mat-icon>{{hidePW ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="password.hasError('required')">
+            Password is <strong>required</strong>
+          </mat-error>
+          <mat-error *ngIf="password.hasError('minlength')">
+            Password must be at least <strong>8</strong> characters long
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>Password Confirm</mat-label>
+          <input matInput [type]="hidePWC ? 'password' : 'text'" formControlName="passwordConfirm">
+          <button mat-icon-button matSuffix (click)="hidePWC = !hidePWC" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePWC">
+            <mat-icon>{{hidePWC ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="passwordConfirm.hasError('required')">
+            Password Confirm is <strong>required</strong>
+          </mat-error>
+          <mat-error *ngIf="passwordConfirm.hasError('minlength')">
+            Password Confirm must be at least <strong>8</strong> characters long
+          </mat-error>
+        </mat-form-field>
+
+        <h3>Company details</h3>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>Company</mat-label>
+          <input matInput formControlName="company">
+          <mat-error *ngIf="company.hasError('required')">
+            Company is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>City</mat-label>
+          <input matInput formControlName="city">
+          <mat-error *ngIf="city.hasError('required')">
+            City is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>Zip</mat-label>
+          <input matInput type="number" formControlName="zip">
+          <mat-error *ngIf="zip.hasError('required')">
+            Zip is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="w-100" appearance="fill">
+          <mat-label>Street (Textarea because of confusing exercise requirements)</mat-label>
+          <textarea matInput formControlName="street"></textarea>
+          <mat-error *ngIf="street.hasError('required')">
+            Street is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+
+
+        <div class="d-flex justify-content-center mb-2">
+          <button mat-flat-button color="primary" (click)="submit()">Sign up</button>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-center">
+        <a mat-button [routerLink]="['/login']">Already have an account? Login here.</a>
+      </div>
+
+    </mat-card-content>
+
+  </mat-card>
+
+</div>
+
