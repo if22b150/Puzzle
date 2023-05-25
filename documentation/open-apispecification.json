@@ -160,14 +160,17 @@
       "post": {
         "description": "Login with email and password",
         "requestBody": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/LoginModel"
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginModel"
+              }
             }
           }
         },
         "responses": {
           "200": {
+            "description": "User model is returned",
             "content": {
               "application/json": {
                 "schema": {
@@ -193,14 +196,17 @@
       "post": {
         "description": "Register a user",
         "requestBody": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/SignupModel"
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupModel"
+              }
             }
           }
         },
         "responses": {
           "201": {
+            "description": "User model is returned",
             "content": {
               "application/json": {
                 "schema": {
@@ -227,6 +233,7 @@
         "description": "Get users",
         "responses": {
           "201": {
+            "description": "Array of User models is returned",
             "content": {
               "application/json": {
                 "schema": {
@@ -249,27 +256,34 @@
             }
           }
         }
-      },
+      }
+    },
+    "/users/{userId}": {
       "put": {
         "description": "Update user",
-        "parameters": {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "requestBody": {
-          "application/json": {
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
             "schema": {
-              "$ref": "#/components/schemas/UpdateUserModel"
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserModel"
+              }
             }
           }
         },
         "responses": {
           "200": {
+            "description": "User model is returned",
             "content": {
               "application/json": {
                 "schema": {
@@ -292,15 +306,17 @@
       },
       "delete": {
         "description": "Delete user",
-        "parameters": {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "format": "int64"
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
-        },
+        ],
         "responses": {
           "204": {
             "description": "No response when user is deleted"
