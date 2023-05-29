@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {AuthService} from "../../services/auth.service";
 import {User} from "../../models/user.model";
@@ -10,10 +10,10 @@ import {User} from "../../models/user.model";
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+  loginForm: UntypedFormGroup;
   hidePW: boolean = true;
 
-  constructor(private formBuilder: FormBuilder,
+  constructor(private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar,
               private authService: AuthService) { }
 

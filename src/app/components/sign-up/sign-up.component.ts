@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {AuthService} from "../../services/auth.service";
 import {finalize} from "rxjs";
@@ -10,12 +10,12 @@ import {finalize} from "rxjs";
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit {
-  signUpForm: FormGroup;
+  signUpForm: UntypedFormGroup;
   hidePW: boolean = true;
   hidePWC: boolean = true;
   loading: boolean;
 
-  constructor(private formBuilder: FormBuilder,
+  constructor(private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar,
               private authService: AuthService) { }
 
