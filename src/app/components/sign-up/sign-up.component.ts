@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {AuthService} from "../../services/auth.service";
+import {finalize} from "rxjs";
 
 @Component({
   selector: 'app-sign-up',
@@ -11,9 +13,11 @@ export class SignUpComponent implements OnInit {
   signUpForm: FormGroup;
   hidePW: boolean = true;
   hidePWC: boolean = true;
+  loading: boolean;
 
   constructor(private formBuilder: FormBuilder,
-              private snackBar: MatSnackBar) { }
+              private snackBar: MatSnackBar,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
     this.signUpForm = this.formBuilder.group({
@@ -36,8 +40,18 @@ export class SignUpComponent implements OnInit {
       return;
     }
 
-    // Do sign up action
-    let snackBarRef = this.snackBar.open('Sign up successful!', null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
+    this.loading = true;
+    this.authService.signUp(this.email.value, this.password.value)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (user) => {
+          let snackBarRef = this.snackBar.open('Sign up successful!', null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
+        },
+        error: (e) => {
+          console.log(e);
+          let snackBarRef = this.snackBar.open('Error', null, {panelClass: ['bg-error', 'text-white'], duration: 1000} );
+        }
+      })
   }
 
   get email(): AbstractControl {

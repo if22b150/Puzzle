@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Observable} from "rxjs";
 import {User} from "../models/user.model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,13 @@ export class AuthService {
   }
 
   loginHttp(username: string, password: string) {
-    this.http.post<{message: string}>('http://localhost:3000/login', {username, password}, this.httpOptions)
+    this.http.post<{message: string}>(environment.apiUrl + '/login', {username, password}, this.httpOptions)
       .subscribe((responseData) => {
         console.log(responseData.message);
       })
+  }
+
+  signUp(username: string, password: string): Observable<User> {
+    return this.http.post<User>(environment.apiUrl + '/users', {username, password}, this.httpOptions);
   }
 }

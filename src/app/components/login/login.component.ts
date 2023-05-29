@@ -29,24 +29,24 @@ export class LoginComponent implements OnInit {
       return;
 
     // Do log in action
-    // this.authService.login(
-    //   this.email.value,
-    //   this.password.value
-    // ).subscribe({
-    //   next: (user: User) => {
-    //     this.snackBar.open(`Login successful! Welcome ${user.username}`, null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
-    //     console.log('Login successful.');
-    //   } ,
-    //   error: () => {
-    //     this.snackBar.open('Login failed!', null, {panelClass: ['bg-danger', 'text-white'], duration: 1000} );
-    //     console.log('Login failed.');
-    //   }
-    // });
+    this.authService.login(
+      this.email.value,
+      this.password.value
+    ).subscribe({
+      next: (user: User) => {
+        this.snackBar.open(`Login successful! Welcome ${user.username}`, null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
+        console.log('Login successful.');
+      } ,
+      error: () => {
+        this.snackBar.open('Login failed!', null, {panelClass: ['bg-danger', 'text-white'], duration: 1000} );
+        console.log('Login failed.');
+      }
+    });
 
-    this.authService.loginHttp(
-        this.email.value,
-        this.password.value
-    );
+    // this.authService.loginHttp(
+    //     this.email.value,
+    //     this.password.value
+    // );
   }
 
   get email(): AbstractControl {
