@@ -19,12 +19,19 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatDividerModule} from "@angular/material/divider";
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import {HttpClientModule} from "@angular/common/http";
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { HighscoresComponent } from './components/highscores/highscores.component';
+import {MatTableModule} from "@angular/material/table";
+
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    SignUpComponent
+    SignUpComponent,
+    DashboardComponent,
+    HighscoresComponent
   ],
     imports: [
       BrowserModule,
@@ -42,7 +49,9 @@ import {HttpClientModule} from "@angular/common/http";
       LayoutModule,
       MatSnackBarModule,
       MatDividerModule,
-      HttpClientModule
+      HttpClientModule,
+      MatProgressSpinnerModule,
+      MatTableModule
     ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs";
+import {BehaviorSubject, finalize, Observable, take} from "rxjs";
 import {User} from "../models/user.model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {environment} from "../../environments/environment";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -12,25 +13,40 @@ export class AuthService {
     headers: new HttpHeaders({'Content-Type': 'application/json'})
   }
 
-  constructor(private http: HttpClient) { }
+  private _user: BehaviorSubject<User>;
 
-  login(username: string, password: string): Observable<User> {
-    return new Observable((observer) => {
-      if(username == "test@test.at" && password == "12345678")
-        observer.next({username: "test@test.at", password: "12345678"});
-      else
-        observer.error();
-    })
+  public set user(user: User) {
+    this._user.next(user);
   }
 
-  loginHttp(username: string, password: string) {
-    this.http.post<{message: string}>(environment.apiUrl + '/login', {username, password}, this.httpOptions)
-      .subscribe((responseData) => {
-        console.log(responseData.message);
-      })
+  public get user(): User {
+    return this._user.value;
+  }
+
+  constructor(private http: HttpClient,
+              private router: Router) {
+    this._user = new BehaviorSubject<User>(null);
+  }
+
+  login(username: string, password: string): Observable<User> {
+    return this.http.post<User>(environment.apiUrl + '/login', {username, password}, this.httpOptions);
   }
 
   signUp(username: string, password: string): Observable<User> {
     return this.http.post<User>(environment.apiUrl + '/users', {username, password}, this.httpOptions);
+  }
+
+  logout() {
+    let httpOptions = {
+      headers: new HttpHeaders({'Content-Type': 'application/json', 'Authorization': '' + this.user?.token})
+    }
+    this.http.delete<any>(environment.apiUrl + '/sessions', httpOptions)
+      .pipe(
+        take(1),
+        finalize(() => {
+          this._user.next(null);
+          this.router.navigate(['']);
+        })
+      ).subscribe();
   }
 }

@@ -86,8 +86,9 @@
 
 
 
-        <div class="d-flex justify-content-center mb-2">
-          <button mat-flat-button color="primary" (click)="submit()">Sign up</button>
+        <div class="d-flex justify-content-center mb-2" style="height: 36px">
+          <button *ngIf="!loading" mat-flat-button color="primary" (click)="submit()">Sign up</button>
+          <mat-spinner *ngIf="loading" style="height: 100%;"></mat-spinner>
         </div>
       </form>
 

@@ -20,6 +20,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   display: flex;
 }
 
+.flex-column {
+  flex-direction: column;
+}
+
 .justify-content-center {
   justify-content: center;
 }
@@ -157,4 +161,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 .text-white {
   color: #fff;
+}
+
+.mat-mdc-snack-bar-container {
+  &.bg-danger {
+    --mdc-snackbar-container-color: #DC4C64;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+  &.bg-success {
+    --mdc-snackbar-container-color: #14A44D;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
 }

@@ -3,6 +3,7 @@ import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from 
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {AuthService} from "../../services/auth.service";
 import {finalize} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sign-up',
@@ -17,7 +18,8 @@ export class SignUpComponent implements OnInit {
 
   constructor(private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar,
-              private authService: AuthService) { }
+              private authService: AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.signUpForm = this.formBuilder.group({
@@ -45,11 +47,13 @@ export class SignUpComponent implements OnInit {
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (user) => {
-          let snackBarRef = this.snackBar.open('Sign up successful!', null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
+          console.log(user);
+          this.snackBar.open('Sign up successful!', null, {panelClass: ['bg-success', 'text-white'], duration: 1000} );
+          this.router.navigate(['login']);
         },
         error: (e) => {
           console.log(e);
-          let snackBarRef = this.snackBar.open('Error', null, {panelClass: ['bg-error', 'text-white'], duration: 1000} );
+          this.snackBar.open(e.error.message, null, {panelClass: ['bg-danger', 'text-white'], duration: 2000} );
         }
       })
   }
