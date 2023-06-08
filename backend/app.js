@@ -1,77 +1,12 @@
-let userId = 1;
-class User {
-  constructor(username, password) {
-    this.id = userId++;
-    this.username = username;
-    this.password = password;
-  }
-
-  createToken() {
-    this.token = Math.random().toString(36).slice(2);
-    return this.token;
-  }
-}
-let highscoreId = 1;
-class Highscore {
-  constructor(user, score) {
-    this.id = highscoreId++;
-    this.user = user;
-    this.score = score;
-  }
-}
-
-class Database {
-  _users;
-  _accessTokens;
-  _highscores;
-
-  constructor() {
-    this._users = [];
-    this._accessTokens = [];
-    this._highscores = [];
-  }
-
-  getUserByUsername(username) {
-    return this._users.find(u => u.username === username);
-  }
-  getUserByToken(token) {
-    let accessToken = this._accessTokens.find(t => t.token === token);
-    return this._users.find(u => u.id === accessToken.id);
-  }
-
-  addUser(username, password) {
-    if(this.getUserByUsername(username))
-      return false;
-
-    let user = new User(username, password)
-    this._users.push(user);
-    return user;
-  }
-
-  deleteUser(user) {
-    this._users = this._users.filter(u => u.id !== user.id);
-    this._accessTokens = this._accessTokens.filter(t => t.id !== user.id);
-  }
-
-  login(user) {
-    let token = user.createToken();
-    this._accessTokens.push({id: user.id, token: token});
-  }
-
-  addHighscore(user, score) {
-    let highscore = new Highscore(user, score);
-    this._highscores.push(highscore);
-    return highscore;
-  }
-}
-
-
 const express = require('express');
 const cors = require('cors');
+const database = require('./database');
+const User = require('./model/user.model').User;
+const AccessToken = require('./model/access-token.model').AccessToken;
+const createToken = require('./model/access-token.model').createToken;
+const Highscore = require('./model/highscore.model').Highscore;
 
 const app = express();
-
-let db = new Database();
 
 app.use(cors());
 
@@ -85,77 +20,166 @@ function authMiddleware(req, res, next) {
       message: 'Not authenticated'
     })
   else {
-    let user = db.getUserByToken(req.headers.authorization);
-    if(!user)
-      res.status(401).json({
-        message: 'Not authenticated'
+    AccessToken.findOne({token: req.headers.authorization})
+      .then((accessToken) => {
+        if (!accessToken)
+          res.status(401).json({
+            message: 'Not authenticated'
+          })
+        else {
+          console.log('accesstoken: ', accessToken)
+          User.findOne({_id: accessToken.user})
+            .then((user) => {
+              if (!user)
+                res.status(401).json({
+                  message: 'Not authenticated'
+                })
+              else {
+                req.body.authUser = user;
+                next();
+              }
+            })
+            .catch((err) => {
+              res.status(500).json({
+                message: 'Database error on User.findOne() in authMiddleware'
+              });
+              console.error(err);
+            })
+        }
       })
-    else
-      next();
+      .catch((err) => {
+        res.status(500).json({
+          message: 'Database error on AccessToken.findOne() in authMiddleware'
+        });
+        console.error(err);
+      })
+  }
+}
+function signUpRequestMiddleware(req, res, next) {
+  let data = req.body;
+  if(!data.username || !data.password)
+    res.status(422).json({message: 'Username or password missing'});
+  else {
+    // promise
+    User.findOne({username: data.username})
+      .then((user) => {
+        console.log(user)
+        if(user)
+          res.status(422).json({
+            message: 'User already exists'
+          });
+        else
+          next();
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: 'Database error on User.findOne() in signUpRequestMiddleware'
+        });
+        console.error(err);
+      });
   }
 }
 
 // POST route for signup
-app.post('/users', (req,res) => {
+app.post('/users', signUpRequestMiddleware, (req,res) => {
   let data = req.body;
-  let addedUser = db.addUser(data.username, data.password);
-  if(!addedUser)
-    res.status(422).json({
-      message: 'User already exists'
+  let user = new User({username: data.username, password: data.password});
+
+  user.save()
+    .then((user) => {
+      res.status(201).json(user);
     })
-  else
-    res.status(201).json(addedUser)
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Database error on User.save() in signUp request'
+      });
+      console.error(err)
+    });
 })
 
 // POST route for login
 app.post('/login', (req, res, next) => {
   const data = req.body;
 
-  let user = db.getUserByUsername(data.username);
-  if(!user)
-    res.status(404).json({
-      message: 'User not found'
+  User.findOne({username: data.username})
+    .then((user) => {
+      if(!user)
+        res.status(404).json({
+          message: 'User not found'
+        });
+      else if (user.password !== data.password)
+        res.status(401).json({
+          message: 'Wrong credentials'
+        })
+      else {
+        let accessToken = new AccessToken({
+          user: user, token: createToken()
+        });
+
+        accessToken.save()
+          .then((accessToken) => {
+            user.token = accessToken.token;
+            res.status(200).json({
+              id: user._id,
+              username: user.username,
+              token: accessToken.token
+            });
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: 'Database error on AccessToken.save() in login request'
+            });
+            console.error(err)
+          });
+      }
     })
-
-  if(user.password !== data.password)
-    res.status(401).json({
-      message: 'Wrong credentials'
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Database error on User.findOne() in login request'
+      });
+      console.error(err);
     })
-
-  db.login(user);
-
-  console.log(db._users);
-  console.log(db._accessTokens);
-
-  res.status(201).json(user)
 })
 
 app.post('/highscores', authMiddleware, (req, res) => {
-  let user = db.getUserByToken(req.headers.authorization);
+  let data = req.body;
+  let highscore = new Highscore({score: data.score, user: data.authUser})
 
-  const data = req.body;
-  let highscore = db.addHighscore(user, data.score);
-
-  console.log(db._highscores);
-  res.status(201).json(highscore);
-})
+  highscore.save()
+    .then((hs) => {
+      res.status(201).json(hs);
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Database error on Highscore.save() in highscores post request'
+      });
+      console.error(err);
+    })
+});
 app.get('/highscores', authMiddleware, (req, res) => {
-  res.status(200).json(db._highscores.sort((a, b) => {
-    return b.score - a.score;
-  }));
+  Highscore.find({}).sort({score: -1}).populate('user').exec()
+    .then((highscores) => {
+      res.status(200).json(highscores)
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Database error on Highscore.find() in highscores get request'
+      });
+      console.error(err);
+    })
 })
 
 app.delete('/sessions', authMiddleware, (req, res) => {
-  let user = db.getUserByToken(req.headers.authorization);
-  db.deleteUser(user);
-
-  console.log(db._users);
-  console.log(db._accessTokens);
-
-  res.status(204).json({})
+  AccessToken.deleteMany({user: req.body.authUser._id})
+    .then(() => {
+      res.status(204).json({})
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Database error on AccessToken.deleteOne() in sessions delete request'
+      });
+      console.error(err);
+    })
 })
 
 module.exports = app;
-
-
-
