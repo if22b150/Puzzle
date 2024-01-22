@@ -32,8 +32,22 @@ export class AuthService {
     return this.http.post<User>(environment.apiUrl + '/login', {username, password}, this.httpOptions);
   }
 
-  signUp(username: string, password: string): Observable<User> {
-    return this.http.post<User>(environment.apiUrl + '/users', {username, password}, this.httpOptions);
+  signUp(
+    username: string,
+    password: string,
+    company: string,
+    city: string,
+    street: string,
+    zip: number
+  ): Observable<User> {
+    return this.http.post<User>(environment.apiUrl + '/users', {
+      username,
+      password,
+      company,
+      city,
+      street,
+      zip
+    }, this.httpOptions);
   }
 
   logout() {

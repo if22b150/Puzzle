@@ -43,7 +43,14 @@ export class SignUpComponent implements OnInit {
     }
 
     this.loading = true;
-    this.authService.signUp(this.email.value, this.password.value)
+    this.authService.signUp(
+      this.email.value,
+      this.password.value,
+      this.company.value,
+      this.city.value,
+      this.street.value,
+      this.zip.value
+    )
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (user) => {

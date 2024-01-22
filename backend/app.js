@@ -83,7 +83,14 @@ function signUpRequestMiddleware(req, res, next) {
 // POST route for signup
 app.post('/users', signUpRequestMiddleware, (req,res) => {
   let data = req.body;
-  let user = new User({username: data.username, password: data.password});
+  let user = new User({
+    username: data.username,
+    password: data.password,
+    company: data.company,
+    street: data.street,
+    city: data.city,
+    zip: data.zip
+  });
 
   user.save()
     .then((user) => {
@@ -122,6 +129,10 @@ app.post('/login', (req, res, next) => {
             res.status(200).json({
               id: user._id,
               username: user.username,
+              company: user.company,
+              city: user.city,
+              street: user.street,
+              zip: user.zip,
               token: accessToken.token
             });
           })
